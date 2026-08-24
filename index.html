@@ -37,9 +37,9 @@
 
         /* ARREGLO edificios y montañas adaptados al tamaño responsivo */
         #edificios {
-            bottom: 14%; right:0; width: 100%; height: 35%;
+            bottom: 14%; right:-200; width: 100%; height: 35%;
             object-fit: contain; object-position: bottom;
-            opacity: 1; z-index: 2;
+            opacity: 1; z-index: -10;
         }
 
         #montana {
@@ -49,7 +49,7 @@
 
         .arbusto { position: absolute; bottom: 13%; z-index: 11; }
         #arbusto1 { left: -1%; width: 50%; max-width: 200px; }
-        #arbusto2 { left: 34%; width: 10%; max-width: 65px; opacity: 0.90; }
+        #arbusto2 { left: 34%; width: 10%; max-width: 0px; opacity: 0.90; }
 
         #ground {
             position: absolute; bottom: 0; width: 100%; height: 15%;
@@ -98,13 +98,16 @@
         .walking { animation: caminar 0.5s infinite; }
 
         /* ==== CUADROS DE DIÁLOGO ==== */
-        .dialog-box {
+       .dialog-box {
             position: absolute; top: 5%; left: 5%; width: 90%;
+            /* Agregamos un alto máximo y scroll por si el texto es muy largo */
+            max-height: 90%; overflow-y: auto; 
             background-color: #362a5c;
             border: 4px solid #fff;
             border-radius: 8px;
             color: #ffd700;
-            padding: 10px; font-size: 10px; line-height: 1.6;
+            /* Hicimos la letra un puntito más pequeña y juntamos los renglones */
+            padding: 10px; font-size: 9px; line-height: 1.4; 
             box-sizing: border-box; display: none; text-align: center; z-index: 20;
             box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
         }
@@ -113,6 +116,8 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #000; color: #fff; display: flex; flex-direction: column;
             justify-content: center; align-items: center; z-index: 50; text-align: center; padding: 20px;
+            /* Esta línea es la que faltaba para que el botón se centre perfecto */
+            box-sizing: border-box; 
         }
         button {
             margin-top: 20px; font-family: 'Press Start 2P', cursive; padding: 15px;
@@ -157,16 +162,17 @@
             <br><br><span style="color:#fff; font-size:9px;">(Toca aquí para avanzar)</span>
         </div>
         
-        <div id="dialogo2" class="dialog-box" style="top: 15%;">
+        <div id="dialogo2" class="dialog-box" style="top: 5%;">
             "<span style="color: #f50814;">¡¡¡ Los esperamos el MIERCOLES 27 DE AGOSTO DE 14:30 a 16:00 HRS POR PASTOS O ISLAS !!! </span>"
-            <br><br>
+            <br>
             "PD: NO FALTES"
-            <br><br>
+            <br>
             "PD: SI FALTAS DIOS MANDARA 10 PLAGAS"
-            <br><br>
+            <br>
             "PD: ES BROMA 😂. ❤ DIOS TE AMAA Y MUCHOO ❤ "
-            <br><br>
-            "YO TAMPOCO LO CREIA" <!--
+            <br>
+            "YO TAMPOCO LO CREIA"
+        </div> <!--
             <br><br><span style="color:#fff; font-size:9px;">(Toca aquí para avanzar)</span>
         </div>
         
