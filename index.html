@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convivio JcD</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0; padding: 0; background-color: #222;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; font-family: 'Press Start 2P', cursive; overflow: hidden;
+        }
+
+        #game-container {
+            width: 100vw; height: 100vh;
+            background-color: #5c94fc;
+            position: relative; overflow: hidden;
+        }
+
+        /* ==== CAPAS DE FONDO ==== */
+        .bg-layer { position: absolute; pointer-events: none; }
+
+        @keyframes moverNubes {
+            from { transform: translateX(100vw); }
+            to { transform: translateX(-50vw); }
+        }
+        .nube {
+            position: absolute; opacity: 0.9; z-index: 1;
+            animation: moverNubes 25s linear infinite;
+        }
+
+        /* ARREGLO edificios: object-fit:contain respeta la proporción original
+           de la imagen dentro de la caja (100% x 25vh) en vez de estirarla */
+        #edificios {
+            bottom: 14%; right:30% ; width: 100%; height: 35vh;
+            object-fit: contain; object-position: bottom;
+            opacity: 1; z-index: 2;
+        }
+
+        /* ARREGLO montaña: centrada de verdad con left:50% + transform,
+           en vez de un left fijo que la dejaba recargada a la izquierda */
+        #montana {
+            bottom: 5%; left: 70%; transform: translateX(-50%);
+            width: 25%; max-width: 320px; z-index: 3;
+        }
+
+        /* ARREGLO arbustos: tamaños reducidos casi a la mitad */
+        .arbusto { position: absolute; bottom: 13%; z-index: 11; }
+        #arbusto1 { left: -1%; width: 50%; max-width: 200px; }
+        #arbusto2 { left: 34%; width: 1%; max-width: 65px; opacity: 0.90; }
+
+        #ground {
+            position: absolute; bottom: 0; width: 100%; height: 15%;
+            background-image: url('bloques.png');
+            background-repeat: repeat-x;
+            background-size: auto 100%;
+            z-index: 15;
+        }
+
+        @keyframes flotar {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .item {
+            position: absolute; z-index: 8;
+            animation: flotar 2s infinite ease-in-out;
+        }
+
+        #cruz { bottom: 30%; right: 12%; height: 22vh; max-height: 160px; filter: drop-shadow(0 0 15px #ffd700); z-index: 4; }
+
+        /* ARREGLO botín: guitarra + pizza + refresco ahora viven dentro de un
+           solo contenedor (#botin). Al posicionarlas relativas a esa caja chica
+           (en vez de relativas a toda la pantalla) quedan agrupadas sin importar
+           el tamaño de pantalla, y flotan juntas como un solo conjunto */
+        #botin {
+            position: absolute; bottom: 15%; right: 8%;
+            width: 24vw; max-width: 170px; height: 13vh; max-height: 95px;
+            z-index: 8; animation: flotar 2s infinite ease-in-out;
+        }
+        #botin img { position: absolute; bottom: 0; }
+        #guitarra { left: 0; height: 100%; }
+        #pizza { left: 25%; height: 45%; bottom: 3%; }
+        #refresco { left: 40%; height: 65%; }
+
+        /* ==== PERSONAJES ==== */
+        .character {
+            position: absolute; bottom: 15%;
+            transition: left 4s linear; z-index: 20;
+        }
+        /* ARREGLO chico + yoshi: mucho más cerca, tanto en la posición
+           inicial como en el punto al que caminan (antes el chico llegaba
+           a 50% y yoshi a 35%, dejándolos incluso más lejos que al inicio) */
+        #estudiante { left: 15%; }
+        #yoshi { left: 10%; z-index: 9; }
+
+        @keyframes caminar {
+            0%, 100% { transform: translateY(5); }
+            50% { transform: translateY(-3px); }
+        }
+        .walking { animation: caminar 0.5s infinite; }
+
+        /* ==== CUADROS DE DIÁLOGO ==== */
+        .dialog-box {
+            position: absolute; top: 5%; left: 5%; width: 90%;
+            background-color: #362a5c;
+            border: 4px solid #fff;
+            border-radius: 8px;
+            color: #ffd700;
+            padding: 15px; font-size: 12px; line-height: 1.6;
+            box-sizing: border-box; display: none; text-align: center; z-index: 20;
+            box-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+        }
+
+        #start-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #000; color: #fff; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 50; text-align: center; padding: 20px;
+        }
+        button {
+            margin-top: 20px; font-family: 'Press Start 2P', cursive; padding: 15px;
+            background-color: #e52521; color: white; border: 4px solid #fff; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="musicaFondo" src="cancion.mp3" loop></audio>
+
+    <div id="game-container">
+        <div id="start-screen">
+            <p></p>
+            <button onclick="iniciarAnimacion()">PRESIONA START</button>
+        </div>
+
+        <!-- Multiplicamos las nubes cambiando su posición inicial y tamaño -->
+        <img src="nubes.png" class="nube" style="top: 5%; width: 30vw; animation-delay: 0s;" alt="">
+        <img src="nubes.png" class="nube" style="top: 25%; width: 20vw; animation-delay: -10s;" alt="">
+        <img src="nubes.png" class="nube" style="top: 15%; width: 40vw; animation-delay: -20s;" alt="">
+
+        <!-- Fondo -->
+        <img src="edificios.png" id="edificios" class="bg-layer" alt="">
+        <img src="montana.png" id="montana" class="bg-layer" alt="">
+
+        <!-- Arbustos clonados -->
+        <img src="arbusto.png" id="arbusto1" class="arbusto" alt="">
+        <img src="arbusto.png" id="arbusto2" class="arbusto" alt="">
+
+        <!-- Cruz + botín agrupado -->
+        <img src="cruz.png" id="cruz" class="item" alt="Cruz">
+        <div id="botin">
+            <img src="guitarra.png" id="guitarra" alt="Guitarra">
+            <img src="pizza.png" id="pizza" alt="Pizza">
+            <img src="refresco.png" id="refresco" alt="Refresco">
+        </div>
+
+        <!-- Personajes -->
+        <div id="estudiante" class="character">
+            <img src="chico.png" alt="Estudiante" style="height: 15vh; max-height: 120px;">
+        </div>
+        <div id="yoshi" class="character">
+            <img src="yoshi.png" alt="Yoshi" style="height: 12vh; max-height: 100px;">
+        </div>
+
+        <!-- Piso -->
+        <div id="ground"></div>
+
+        <!-- Diálogos -->
+        <div id="dialogo1" class="dialog-box">
+            "Hola!!! Acompáñanos a nuestro convivio cristiano de JcD Esime AZCAPO (Huelum!), de inicio de semestre."
+            <br><br><span style="color:#fff; font-size:9px;">(Toca aquí para avanzar)</span>
+        </div>
+        <div id="dialogo2" class="dialog-box" style="top: 25%;">
+            "<span style="color: #f50814;">¡¡¡  Los esperamos el MIERCOLES 27 DE AGOSTO DE 14:30 a 16:00 HRS POR PASTOS O ISLAS !!! </span>"
+           <br><br>
+           "PD: NO FALTES"
+           <br><br>
+           "PD: SI FALTAS DIOS MANDARA 10 PLAGAS"
+           <br><br>
+           "PD: ES BROMA 😂. ❤ DIOS TE AMAA Y MUCHOO ❤ "
+           <br><br>
+           "YO TAMPOCO LO CREIA"
+           <br><br><span style="color:#fff; font-size:9px;">(Toca aquí para avanzar)</span>
+        </div>
+        <!-- Diálogo 3 completamente nuevo -->
+        <div id="dialogo3" class="dialog-box" style="top: 25%;">
+            Mándame un mensaje si asistirás a mi Insta
+            <br><br>
+            <a href="https://www.instagram.com/emi_hageo/" target="_blank" style="color: #ff9c00; text-decoration: none;">
+                "@Emi_Hageo :)"
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const startScreen = document.getElementById('start-screen');
+        const musica = document.getElementById('musicaFondo');
+        const dialogo1 = document.getElementById('dialogo1');
+        const dialogo2 = document.getElementById('dialogo2');
+        const dialogo3 = document.getElementById('dialogo3'); // Agrega esta línea
+        const estudiante = document.getElementById('estudiante');
+        const yoshi = document.getElementById('yoshi');
+
+        function iniciarAnimacion() {
+            startScreen.style.display = 'none';
+            musica.volume = 0.5;
+            musica.play();
+            setTimeout(() => { dialogo1.style.display = 'block'; }, 500);
+        }
+
+        dialogo1.addEventListener('click', function() {
+            dialogo1.style.display = 'none';
+
+            estudiante.classList.add('walking');
+            yoshi.classList.add('walking');
+
+            // Caminan juntos, manteniendo la misma distancia corta entre ellos
+            estudiante.style.left = '75%';
+            yoshi.style.left = '81%';
+
+            setTimeout(() => {
+                estudiante.classList.remove('walking');
+                yoshi.classList.remove('walking');
+                dialogo2.style.display = 'block';
+            }, 4000);
+        });
+        // Cuando toquen el diálogo 2...
+        dialogo2.addEventListener('click', function() {
+            dialogo2.style.display = 'none';    // Ocultamos el diálogo 2
+            dialogo3.style.display = 'block';   // Mostramos tu Instagram
+        });
+    </script>
+</body>
+</html>
