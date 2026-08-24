@@ -43,8 +43,18 @@
         }
 
         #montana {
-            bottom: 5%; left: 70%; transform: translateX(-50%);
+            bottom: 5%; left: 40%; transform: translateX(-50%);
             width: 25%; max-width: 320px; z-index: 3;
+        }
+
+        /* ARREGLO escuela: Tu nueva imagen de fondo */
+        #escuela {
+            bottom: 15%; 
+            left: 60%; /* Modifica este porcentaje para moverla a la izquierda o derecha */
+            width: 40%; /* Modifica este porcentaje para hacerla más grande o chica */
+            max-width: 600px; 
+            object-fit: contain; object-position: bottom;
+            z-index: 3; /* El 3 la pone delante de los edificios, pero detrás de ti */
         }
 
         .arbusto { position: absolute; bottom: 13%; z-index: 11; }
@@ -141,6 +151,8 @@
 
         <img src="edificios.png" id="edificios" class="bg-layer" alt="">
         <img src="montana.png" id="montana" class="bg-layer" alt="">
+        <!-- Tu Escuela -->
+        <img src="escuela.png" id="escuela" class="bg-layer" alt="ESIME">
 
         <img src="arbusto.png" id="arbusto1" class="arbusto" alt="">
         <img src="arbusto.png" id="arbusto2" class="arbusto" alt="">
